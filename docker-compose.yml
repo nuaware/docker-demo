@@ -1,6 +1,7 @@
-app:
-    build: .
-    hostname: dockercon
-    domainname: demo.local
-    ports:
-        - "8080"
+version: '2'
+services:
+    app:
+        build: .
+        image: mariolet/docker-demo:latest
+        ports:
+            - "80:8080"
