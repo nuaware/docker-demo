@@ -12,7 +12,7 @@ import (
 )
 
 const (
-        DOCKER_ASCII_ART = "static/img/docker_blue.txt"
+        DOCKER_ASCII_ART = "static/img/docker_red.txt"
 	escape = "\x1b"
 	colour_me_yellow = escape + "[1;33m"
 	colour_me_normal = escape + "[0;0m"
