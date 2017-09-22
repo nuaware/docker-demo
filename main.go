@@ -59,9 +59,12 @@ func index(w http.ResponseWriter, r *http.Request) {
         if CaseInsensitiveContains(userAgent, "wget") || CaseInsensitiveContains(userAgent, "curl") {
            w.Header().Set("Content-Type", "text/txt")
 
+	   fmt.Printf("request from %s\n", r.Header.Get("X-Forwarded-For"))
+	   fmt.Printf("request from %s\n", r.url)
+
 	   content, _ := ioutil.ReadFile( DOCKER_ASCII_ART )
 	   w.Write([]byte(content))
-           fmt.Fprintf(w, "\n%sServed from host %s%s\n", colour_me_yellow, hostname, colour_me_normal)
+           fmt.Fprintf(w, "\n%sServed from container %s%s\n", colour_me_yellow, hostname, colour_me_normal)
 
 	   return
 	}
