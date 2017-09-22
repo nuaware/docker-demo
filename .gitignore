@@ -1,2 +1,4 @@
 #docker-demo
+templates/index.html.tmpl
+main.go
 *.swp
