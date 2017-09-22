@@ -12,6 +12,8 @@ import (
 )
 
 const (
+	// Courtesy of "telnet mapscii.me"                                                               
+	MAP_ASCII_ART    = "static/img/mapscii.txt"
         DOCKER_ASCII_ART = "static/img/docker_red.txt"
 	escape = "\x1b"
 	colour_me_yellow = escape + "[1;33m"
@@ -92,6 +94,7 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/ping", ping)
 	mux.HandleFunc("/", index)
+	mux.HandleFunc("/MAP", index)
 
 	log.Printf("listening on %s\n", listenAddr)
 
