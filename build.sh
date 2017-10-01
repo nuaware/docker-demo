@@ -10,33 +10,26 @@ push_images() {
     done
 }
 
+build_image() {
+    TXT_IMAGE=$1; shift
+    PNG_IMAGE=$1; shift
+    IMAGE_NAME=$1; shift
+    IMAGE_NAME_2x=$1; shift
 
-echo; echo "push build:21"
+    echo; echo "---- Building image $IMAGE_NAME (and tag $IMAGE_NAME_2x)"
+    sed "s/REPLACE_LOGO/$TXT_IMAGE/" demo-main-go.tmpl > main.go
+    sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
+    docker build -t $IMAGE_NAME
+    docker tag      $IMAGE_NAME $IMAGE_NAME_2x
+}
 
+build_image "docker_blue.txt" "docker_blue.png" mjbright/docker-demo:1 mjbright/docker-demo:20
+build_image "docker_red.txt"  "docker_red.png"  mjbright/docker-demo:2 mjbright/docker-demo:21
 
-sed "s/REPLACE_LOGO/docker_blue.txt/" demo-main-go.tmpl > main.go
-sed "s/REPLACE_LOGO/docker_blue.png/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
-docker build -t mjbright/docker-demo:1 .
-docker tag      mjbright/docker-demo:1 mjbright/docker-demo:20
-#exit 1
+build_image "kubernetes_blue.txt" "kubernetes_blue.png" mjbright/k8s-demo:1 mjbright/k8s-demo:20
+build_image "kubernetes_red.txt"  "kubernetes_red.png"  mjbright/k8s-demo:2 mjbright/k8s-demo:21
 
-
-sed "s/REPLACE_LOGO/docker_red.txt/" demo-main-go.tmpl > main.go
-sed "s/REPLACE_LOGO/docker_red.png/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
-docker build -t mjbright/docker-demo:2 .
-docker tag      mjbright/docker-demo:2 mjbright/docker-demo:21
-
-sed "s/REPLACE_LOGO/kubernetes_blue.txt/" demo-main-go.tmpl > main.go
-sed "s/REPLACE_LOGO/kubernetes_blue.png/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
-docker build -t mjbright/k8s-demo:1 .
-docker tag      mjbright/k8s-demo:1 mjbright/k8s-demo:20
-
-sed "s/REPLACE_LOGO/kubernetes_red.txt/" demo-main-go.tmpl > main.go
-sed "s/REPLACE_LOGO/kubernetes_red.png/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
-docker build -t mjbright/k8s-demo:2 .
-docker tag      mjbright/k8s-demo:2 mjbright/k8s-demo:21
-
-#push_images mjbright/docker-demo:1 mjbright/docker-demo:2 mjbright/k8s-demo:1 mjbright/k8s-demo:2
+push_images mjbright/docker-demo:1 mjbright/docker-demo:2 mjbright/k8s-demo:1 mjbright/k8s-demo:2
 
 exit 0
 
