@@ -19,8 +19,10 @@ build_image() {
     echo; echo "---- Building image $IMAGE_NAME (and tag $IMAGE_NAME_2x)"
     sed "s/REPLACE_LOGO/$TXT_IMAGE/" demo-main-go.tmpl > main.go
     sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
-    docker build -t $IMAGE_NAME
+    set -x
+    docker build -t $IMAGE_NAME .
     docker tag      $IMAGE_NAME $IMAGE_NAME_2x
+    set +x
 }
 
 build_image "docker_blue.txt" "docker_blue.png" mjbright/docker-demo:1 mjbright/docker-demo:20
