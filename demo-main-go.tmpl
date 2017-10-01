@@ -46,7 +46,7 @@ func CaseInsensitiveContains(s, substr string) bool {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	log.Printf("request from %s\n", r.Header.Get("X-Forwarded-For"))
+	log.Printf("Request from '%s' (%s)\n", r.Header.Get("X-Forwarded-For"), r.URL.Path)
 
 	hostname, err := os.Hostname()
 	if err != nil {
@@ -58,9 +58,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 
         if CaseInsensitiveContains(userAgent, "wget") || CaseInsensitiveContains(userAgent, "curl") {
            w.Header().Set("Content-Type", "text/txt")
-
-	   fmt.Printf("request from %s\n", r.Header.Get("X-Forwarded-For"))
-	   fmt.Printf("request from %s\n", r.URL.Path)
 
            var content []byte
 
@@ -79,7 +76,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	// Get user-agent: else return html as normal ...
 	t, err := loadTemplate("templates/index.html.tmpl")
 	if err != nil {
-		fmt.Printf("error loading template: %s\n", err)
+		log.Printf("error loading template: %s\n", err)
 		return
 	}
 
@@ -90,6 +87,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Hostname: hostname,
 	}
 
+        // apply Context values to template
 	t.Execute(w, cnt)
 }
 
