@@ -1,22 +1,22 @@
 [1;36m
-MMMMMMMMMMMMMMMMmy+::+hNMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMms/..-/o+/-`.+yNMMMMMMMMMMMM
-MMMMMMMMds/`.:+ssssssssso/-`./ymMMMMMMMM
-MMMMms:`.:+ssssssss//ssssssso/-`./smMMMM
-MMMs -+ssssssssssss.-ssssssssssss+. yMMM
-MMN `sssssssssso+::``:/+sssssssssss`.MMM
-MMo /ssss..+o:` `--  :-` ./s/..ssss/ yMM
-MM``sssssso.  .oss+  sss+`  -ossssss`-MM
-My :ssssss/ `- `:+/  ++-  -` +ssssss: dM
-M. ossssss` oso:   ``  `:ss+ .sssssso /M
-h -sssssso `o+/-` .ss` `:/+o  sssssss: m
-: osss+::-  ``.--  `` `--.`   -:/ossso +
-. osss+/os+ .oss+  :- `osso` /so++ssso :
-d. /sssssss+``/+  /ss: `o: `+sssssss/`:N
-MMo .osssssss/.  .://:`  ./ssssssso..hMM
-MMMm: :sssssss:`//:--://.:sssssss: oNMMM
-MMMMMy``+ssss/`osssssssso`/ssss+`-mMMMMM
-MMMMMMN+ -osssssssssssssssssso-`yMMMMMMM
-MMMMMMMMd- :++++++++++++++++:`/NMMMMMMMM
-MMMMMMMMMMh+:::::::::::::::/omMMMMMMMMMM
+                ./shhs:`                
+            .+ymmdyosydNms/`            
+        -+yNmhs+++++++++oydNmy/.        
+    .+hNmhs++++++++yy+++++++oydNmy+.    
+   +Mds++++++++++++md++++++++++++smM/   
+  `MN++++++++++oshhNNhys+++++++++++Nm   
+  oMy++++mmsohNMNddMMhdNMmy+ymm++++yM/  
+  NN++++++omMMmo++sMM+++sNMMdo++++++Nd  
+ /Mh++++++yMNdMNhsyMMssdMMdNMs++++++hM- 
+ mMo++++++NMo+ohMMMNNMMNh++sMm++++++oMy 
+:Md++++++oMNosydNMm++NMNhysoMM+++++++hM.
+hMo+++shhdMMNNmddMMNNMNddmNMMMdhyo+++oMs
+mMo+++syo+sMmo++sMMhdMNo++oNMy+oss+++oMh
+-mMy+++++++sNNysMMy++hMNohMNs+++++++yNh`
+  oMmo+++++++ymMMmhyyhNMMmy+++++++omm:  
+   .hMh+++++++hNyyhddhyymh+++++++hMo`   
+     /NNs++++yNo++++++++oNy++++sNd.     
+      `sMdo++++++++++++++++++odN/       
+        -dMhsssssssssssssssshNy`        
+          :shhhhhhhhhhhhhhhyo.          
 [0m
