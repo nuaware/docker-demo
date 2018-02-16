@@ -53,10 +53,15 @@ func index(w http.ResponseWriter, r *http.Request) {
 		hostname = "unknown"
 	}
 
-	// Get user-agent: if wget/curl return ascii-text
-	userAgent := r.Header.Get("User-Agent")
+        // Get user-agent: if text-browser, e.g. wget/curl/httpie/lynx/elinks return ascii-text image:
+        userAgent := r.Header.Get("User-Agent")
 
-        if CaseInsensitiveContains(userAgent, "wget") || CaseInsensitiveContains(userAgent, "curl") {
+        if CaseInsensitiveContains(userAgent, "wget") ||
+           CaseInsensitiveContains(userAgent, "curl") ||
+           CaseInsensitiveContains(userAgent, "httpie") ||
+           CaseInsensitiveContains(userAgent, "links") ||
+           CaseInsensitiveContains(userAgent, "lynx")
+           {
            w.Header().Set("Content-Type", "text/txt")
 
            var content []byte
