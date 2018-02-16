@@ -60,8 +60,7 @@ func index(w http.ResponseWriter, r *http.Request) {
            CaseInsensitiveContains(userAgent, "curl") ||
            CaseInsensitiveContains(userAgent, "httpie") ||
            CaseInsensitiveContains(userAgent, "links") ||
-           CaseInsensitiveContains(userAgent, "lynx")
-           {
+           CaseInsensitiveContains(userAgent, "lynx") {
            w.Header().Set("Content-Type", "text/txt")
 
            var content []byte
