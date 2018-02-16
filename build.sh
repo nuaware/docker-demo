@@ -15,8 +15,12 @@ build_image() {
     PNG_IMAGE=$1; shift
     IMAGE_NAME=$1; shift
 
+    IMAGE_VERSION=${IMAGE_NAME#*:}
+
     echo; echo "---- Building image $IMAGE_NAME"
-    sed "s/REPLACE_LOGO/$TXT_IMAGE/" demo-main-go.tmpl > main.go
+    sed -e "s/REPLACE_LOGO/$TXT_IMAGE/" \
+        -e "s/IMAGE_VERSION/$IMAGE_VERSION/" \
+        demo-main-go.tmpl > main.go
     sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
     set -x
     docker build -t $IMAGE_NAME .
@@ -40,7 +44,7 @@ build_image "kubernetes_cyan.txt"   "kubernetes_cyan.png"   mjbright/k8s-demo:5
 build_image "kubernetes_white.txt"  "kubernetes_white.png"  mjbright/k8s-demo:6
 
 IMAGES=""
-for images in mjbright/docker-demo mjbright/k8s-demo; do
+for image in mjbright/docker-demo mjbright/k8s-demo; do
    for version in $(seq $VERSIONS); do
        IMAGES+="${image}:${version} "
    done

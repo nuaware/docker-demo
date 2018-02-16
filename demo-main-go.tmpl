@@ -9,10 +9,12 @@ import (
 	"os"
 	"strings"
 	"io/ioutil"
+	"time"
 )
 
 const (
 	// Courtesy of "telnet mapascii.me"                                                               
+	image_version    = IMAGE_VERSION
 	MAP_ASCII_ART    = "static/img/mapascii.txt"
         LOGO_ASCII_ART   = "static/img/REPLACE_LOGO"
 	escape = "\x1b"
@@ -52,6 +54,17 @@ func index(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		hostname = "unknown"
 	}
+
+        if IMAGE_VERSION == 3 {
+            http.NotFound(w, r)
+            return
+        }
+
+        // delay 60 seconds:
+        if IMAGE_VERSION == 4 {
+            const delay = 60 * 1000 * time.Millisecond
+	    time.Sleep(delay)
+        }
 
         // Get user-agent: if text-browser, e.g. wget/curl/httpie/lynx/elinks return ascii-text image:
         userAgent := r.Header.Get("User-Agent")
