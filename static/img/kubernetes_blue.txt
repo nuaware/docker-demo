@@ -1,4 +1,4 @@
-[1;36m
+[1;34m
                 ./shhs:`                
             .+ymmdyosydNms/`            
         -+yNmhs+++++++++oydNmy/.        
