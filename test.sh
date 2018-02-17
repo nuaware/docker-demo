@@ -26,8 +26,25 @@ OLD() {
   done
 }
 
+CLEANUP() {
+    RUNNING_DEMO_C=$(docker ps | grep -E "docker-demo|k8s-demo" | awk '{ print $1;}')
+    [ ! -z "$RUNNING_DEMO_C" ] && {
+        CMD="docker stop $RUNNING_DEMO_C"
+        echo $CMD
+        eval $CMD
+    }
+
+    STOPPED_DEMO_C=$(docker ps -a | grep -E "docker-demo|k8s-demo" | awk '{ print $1;}')
+    [ ! -z "$STOPPED_DEMO_C" ] && {
+        CMD="docker rm $STOPPED_DEMO_C"
+        echo $CMD
+        eval $CMD
+    }
+}
+
 VERSIONS=6
 
+CLEANUP
 
 for image in mjbright/docker-demo mjbright/k8s-demo; do
     BASE_PORT=9100
@@ -36,10 +53,8 @@ for image in mjbright/docker-demo mjbright/k8s-demo; do
     for version in $(seq $VERSIONS); do
         let PORT=BASE_PORT+version
 
-        docker pull $image:$version
+        #docker pull $image:$version
         docker run --rm -p ${PORT}:8080 -d $image:$version
     done
 done
-
-
 
