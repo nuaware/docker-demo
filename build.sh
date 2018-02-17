@@ -1,9 +1,9 @@
 #!/bin/bash
 
-push_images() {
-    echo; echo "Docker login:"
-    docker login
+echo; echo "Docker login:"
+docker login
 
+push_images() {
     for image in $*; do
         echo; echo "push $image"
         docker push $image
@@ -13,17 +13,18 @@ push_images() {
 build_image() {
     TXT_IMAGE=$1; shift
     PNG_IMAGE=$1; shift
-    IMAGE_NAME=$1; shift
+    IMAGE_NAME_VERSION=$1; shift
 
-    IMAGE_VERSION=${IMAGE_NAME#*:}
+    IMAGE_VERSION=${IMAGE_NAME_VERSION#*:}
 
-    echo; echo "---- Building image $IMAGE_NAME"
+    echo; echo "---- Building image $IMAGE_NAME_VERSION [VERSION:$IMAGE_VERSION]"
     sed -e "s/REPLACE_LOGO/$TXT_IMAGE/" \
+        -e "s?IMAGE_NAME_VERSION?$IMAGE_NAME_VERSION?" \
         -e "s/IMAGE_VERSION/$IMAGE_VERSION/" \
         demo-main-go.tmpl > main.go
     sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
     set -x
-    docker build -t $IMAGE_NAME .
+    docker build -t $IMAGE_NAME_VERSION .
     set +x
 }
 
