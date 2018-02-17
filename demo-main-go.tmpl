@@ -9,11 +9,14 @@ import (
 	"os"
 	"strings"
 	"io/ioutil"
-	"time"
+	"time"    // Used for Sleep
+	"strconv" // Used to get integer from string
+	// "encoding/json"
 )
 
 const (
-	// Courtesy of "telnet mapascii.me"                                                               
+	// Courtesy of "telnet mapascii.me"
+	image_name_version = "IMAGE_NAME_VERSION"
 	image_version    = IMAGE_VERSION
 	MAP_ASCII_ART    = "static/img/mapascii.txt"
         LOGO_ASCII_ART   = "static/img/REPLACE_LOGO"
@@ -34,19 +37,99 @@ type (
 	}
 )
 
+// -----------------------------------
+// func: init
+//
+// Initialize listener:
+//
 func init() {
 	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
 }
 
+// -----------------------------------
+// func: loadTemplate
+//
+// load template file and substitute variables
+//
 func loadTemplate(filename string) (*template.Template, error) {
 	return template.ParseFiles(filename)
 }
 
+// -----------------------------------
+// func: CaseInsensitiveContains
+//
+// Do case insensitive match - of substr in s
+//
 func CaseInsensitiveContains(s, substr string) bool {
         s, substr = strings.ToUpper(s), strings.ToUpper(substr)
         return strings.Contains(s, substr)
 }
 
+// -----------------------------------
+// func: formatRequest
+//
+// generates ascii representation of a request
+//
+// From: https://medium.com/doing-things-right/pretty-printing-http-requests-in-golang-a918d5aaa000
+//
+func formatRequest(w http.ResponseWriter, r *http.Request) {
+    // Create return string
+    var request []string
+
+    // Add the request string
+    url := fmt.Sprintf("%v %v %v", r.Method, r.URL, r.Proto)
+    request = append(request, url)
+
+    // Add the host
+    request = append(request, fmt.Sprintf("Host: %v", r.Host))
+
+    // Loop through headers
+    for name, headers := range r.Header {
+        name = strings.ToLower(name)
+        for _, h := range headers {
+            request = append(request, fmt.Sprintf("%v: %v", name, h))
+        }
+    }
+
+    // If this is a POST, add post data
+    if r.Method == "POST" {
+        r.ParseForm()
+        request = append(request, "\n")
+        request = append(request, r.Form.Encode())
+    }
+
+    // Return the request as a string
+    //return strings.Join(request, "\n")
+
+    fmt.Fprintf(w, strings.Join(request, "\n"))
+    return
+}
+
+// -----------------------------------
+// func: statusCodeTest
+//
+// Example handler - sets status code
+//
+func statusCodeTest(w http.ResponseWriter, req *http.Request) {
+    //m := map[string]string{
+        //"foo": "bar",
+    //}
+    //w.Header().Add("Content-Type", "application/json")
+
+    //num := http.StatusCreated
+    num := http.StatusInternalServerError
+
+    w.WriteHeader( num )
+
+    //_ = json.NewEncoder(w).Encode(m)
+    fmt.Fprintf(w, "\nWriting status code <%d>\n", num)
+}
+
+// -----------------------------------
+// func: index
+//
+// Main index handler - handles different requests
+//
 func index(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Request from '%s' (%s)\n", r.Header.Get("X-Forwarded-For"), r.URL.Path)
 
@@ -55,18 +138,50 @@ func index(w http.ResponseWriter, r *http.Request) {
 		hostname = "unknown"
 	}
 
-        if IMAGE_VERSION == 3 {
-            http.NotFound(w, r)
+        // image_version 3: return early with status code 404 or /CODE (from r.URL.Path)
+        //
+        if image_version == 3 {
+            //fmt.Fprintf(w, "\nPATH=<%s>", r.URL.Path)
+            //if r.URL.Path == "/map" || r.URL.Path == "/MAP" {}
+
+            num, err := strconv.Atoi( r.URL.Path[1:] )
+            if err == nil {
+                // how to set numeric status code?
+                // http.Error(w, http.StatusText(num), num)
+
+                //num = http.StatusInternalServerError
+                w.WriteHeader( num )
+                fmt.Fprintf(w, "\nWriting status code <%d>\n", num)
+            } else {
+                fmt.Fprintf(w, "\nWriting default status code <NotFound>\n")
+                http.NotFound(w, r)
+            }
+
             return
         }
 
-        // delay 60 seconds:
-        if IMAGE_VERSION == 4 {
-            const delay = 60 * 1000 * time.Millisecond
+        // image_version 4: return content after delay of 60 secs or /SECS (from r.URL.Path)
+        //
+        if image_version == 4 {
+            fmt.Fprintf(w, "\nPATH=<%s>", r.URL.Path)
+
+	    DEFAULT_SECS := 60
+
+            delay := time.Duration(DEFAULT_SECS) * 1000 * time.Millisecond
+
+            num, err := strconv.Atoi( r.URL.Path[1:] )
+            if err == nil {
+                fmt.Fprintf(w, "\nSleeping <%d> secs\n", num)
+                delay = time.Duration(num) * 1000 * time.Millisecond
+            } else {
+                fmt.Fprintf(w, "\nSleeping default <%d> secs\n", DEFAULT_SECS)
+            }
+
 	    time.Sleep(delay)
         }
 
         // Get user-agent: if text-browser, e.g. wget/curl/httpie/lynx/elinks return ascii-text image:
+        //
         userAgent := r.Header.Get("User-Agent")
 
         if CaseInsensitiveContains(userAgent, "wget") ||
@@ -85,12 +200,13 @@ func index(w http.ResponseWriter, r *http.Request) {
            }
 
 	   w.Write([]byte(content))
-           fmt.Fprintf(w, "\nServed from container %s%s%s\n", colour_me_yellow, hostname, colour_me_normal)
+           fmt.Fprintf(w, "\nServed from container %s%s%s [image %s]\n", colour_me_yellow, hostname, colour_me_normal, image_name_version)
 
 	   return
 	}
 
-	// Get user-agent: else return html as normal ...
+	// else return html as normal ...
+        //
 	t, err := loadTemplate("templates/index.html.tmpl")
 	if err != nil {
 		log.Printf("error loading template: %s\n", err)
@@ -108,16 +224,30 @@ func index(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, cnt)
 }
 
+// -----------------------------------
+// func: ping
+//
+// Ping handler - echos back remote address
+//
 func ping(w http.ResponseWriter, r *http.Request) {
 	resp := fmt.Sprintf("ping: hello %s\n", r.RemoteAddr)
 	w.Write([]byte(resp))
 }
 
+// -----------------------------------
+// func: main
+//
+//
+//
 func main() {
 	flag.Parse()
 
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", index)
+	mux.HandleFunc("/test", statusCodeTest)
+
+	mux.HandleFunc("/echo", formatRequest)
+	mux.HandleFunc("/ECHO", formatRequest)
 
 	mux.HandleFunc("/ping", ping)
 	mux.HandleFunc("/PING", ping)
@@ -131,3 +261,4 @@ func main() {
 		log.Fatalf("error serving: %s", err)
 	}
 }
+
