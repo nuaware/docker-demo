@@ -34,6 +34,7 @@ type (
 	Content struct {
 		Title    string
 		Hostname string
+		Image    string
 	}
 )
 
@@ -218,6 +219,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	cnt := &Content{
 		Title:    title,
 		Hostname: hostname,
+		Image:    image_name_version,
 	}
 
         // apply Context values to template
