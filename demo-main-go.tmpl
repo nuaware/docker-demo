@@ -1,5 +1,9 @@
 package main
 
+// TODO:
+//   Cleanup image info (spaces to separate from "Served from" message
+//   Add verbose template index.html.tmpl.verbose.tmpl to handle extra info
+
 import (
 	"flag"
 	"fmt"
@@ -224,6 +228,7 @@ func index(w http.ResponseWriter, r *http.Request) {
                        fmt.Fprintf(w, "ip %s\n", ip.String())
                    }
                }
+               fmt.Fprintf(w, "listening on %s\n", listenAddr)
            }
 
 	   return
