@@ -54,7 +54,16 @@ for image in mjbright/docker-demo mjbright/k8s-demo; do
         let PORT=BASE_PORT+version
 
         #docker pull $image:$version
-        docker run --rm -p ${PORT}:8080 -d $image:$version
+
+        # expose container port on localhost:
+        #docker run --rm -p ${PORT}:8080 -d $image:$version
+
+        # expose listen on container port:
+        #docker run --rm -d $image:$version -v -listen $PORT
+        #docker run -d $image:$version -v -listen :$PORT
+
+        # expose listen on container port and expose on localhost: quel interet?
+        docker run --rm -d -p ${PORT}:${PORT} $image:$version -v -listen :$PORT
     done
 done
 
