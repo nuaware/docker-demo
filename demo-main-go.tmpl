@@ -244,10 +244,6 @@ func index(w http.ResponseWriter, r *http.Request) {
         //
         templateFile := "templates/index.html.tmpl"
 
-        if verbose || headers {
-            templateFile = "templates/index.html.tmpl.verbose"
-        }
-
 	t, err := loadTemplate(templateFile)
 	if err != nil {
 		log.Printf("error loading template from %s: %s\n", templateFile, err)
