@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -28,6 +29,7 @@ const (
 var (
 	mux        = http.NewServeMux()
 	listenAddr string
+	verbose    bool
 )
 
 type (
@@ -45,6 +47,7 @@ type (
 //
 func init() {
 	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
+	flag.BoolVar(&verbose, "v", false, "verbose (false)")
 }
 
 // -----------------------------------
@@ -202,6 +205,26 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 	   w.Write([]byte(content))
            fmt.Fprintf(w, "\nServed from container %s%s%s [image %s]\n", colour_me_yellow, hostname, colour_me_normal, image_name_version)
+
+           if verbose {
+               ifaces, _ := net.Interfaces()
+               // handle err
+               for _, i := range ifaces {
+                   addrs, _ := i.Addrs()
+                   // handle err
+                   for _, addr := range addrs {
+                       var ip net.IP
+                       switch v := addr.(type) {
+                       case *net.IPNet:
+                               ip = v.IP
+                       case *net.IPAddr:
+                               ip = v.IP
+                       }
+                       // process IP address
+                       fmt.Fprintf(w, "ip %s\n", ip.String())
+                   }
+               }
+           }
 
 	   return
 	}
