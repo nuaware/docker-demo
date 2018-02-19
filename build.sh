@@ -2,6 +2,9 @@
 
 VERSIONS=6
 
+EXPOSE_PORT=4321
+EXPOSE_PORT=80
+
 ################################################################################
 # Functions:
 
@@ -29,9 +32,13 @@ build_image() {
     sed -e "s/REPLACE_LOGO/$TXT_IMAGE/" \
         -e "s?IMAGE_NAME_VERSION?$IMAGE_NAME_VERSION?" \
         -e "s/IMAGE_VERSION/$IMAGE_VERSION/" \
+        -e "s/EXPOSE_PORT/$EXPOSE_PORT/" \
         demo-main-go.tmpl > main.go
 
     sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
+
+    sed "s/EXPOSE_PORT/$EXPOSE_PORT/" Dockerfile.tmpl > Dockerfile
+    sed "s/EXPOSE_PORT/$EXPOSE_PORT/" test.sh.tmpl > test.sh
 
     set -x
     docker build -t $IMAGE_NAME_VERSION .
