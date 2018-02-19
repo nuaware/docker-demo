@@ -1,5 +1,13 @@
 #!/bin/bash
 
+VERSIONS=6
+
+HEADERS=""
+VERBOSE=""
+
+################################################################################
+# Functions:
+
 press() {
     echo $*
     echo "Press <return>"
@@ -42,7 +50,23 @@ CLEANUP() {
     }
 }
 
-VERSIONS=6
+################################################################################
+# Args:
+
+while [ ! -z "$1" ];do
+    case $1 in
+        -1) VERSIONS=1;;
+   
+        -c) CLEANUP; exit;;
+
+        -h) HEADERS="-h";;
+        -v) VERBOSE="-v";;
+    esac
+    shift
+done
+
+################################################################################
+# Main:
 
 CLEANUP
 
@@ -59,11 +83,11 @@ for image in mjbright/docker-demo mjbright/k8s-demo; do
         #docker run --rm -p ${PORT}:8080 -d $image:$version
 
         # expose listen on container port:
-        #docker run --rm -d $image:$version -v -listen $PORT
-        #docker run -d $image:$version -v -listen :$PORT
+        #docker run --rm -d $image:$version $HEADERS $VERBOSE -listen $PORT
+        #docker run -d $image:$version $HEADERS $VERBOSE -listen :$PORT
 
         # expose listen on container port and expose on localhost: quel interet?
-        docker run --rm -d -p ${PORT}:${PORT} $image:$version -v -listen :$PORT
+        docker run --rm -d -p ${PORT}:${PORT} $image:$version $HEADERS $VERBOSE -listen :$PORT
     done
 done
 
