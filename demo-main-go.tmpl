@@ -34,14 +34,16 @@ var (
 	mux        = http.NewServeMux()
 	listenAddr string
 	verbose    bool
+	headers    bool
 )
 
 type (
 	Content struct {
-		Title    string
-		Hostname string
-		Image    string
+		Title       string
+		Hostname    string
+		Image       string
 		NetworkInfo string
+		RequestPP   string
 	}
 )
 
@@ -53,6 +55,7 @@ type (
 func init() {
 	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
 	flag.BoolVar(&verbose,      "v",      false,   "verbose (false)")
+	flag.BoolVar(&headers,      "h",      false,   "show headers (false)")
 }
 
 // -----------------------------------
@@ -75,13 +78,27 @@ func CaseInsensitiveContains(s, substr string) bool {
 }
 
 // -----------------------------------
+// func: formatRequestHandler
+//
+// generates ascii representation of a request
+//
+// From: https://medium.com/doing-things-right/pretty-printing-http-requests-in-golang-a918d5aaa000
+//
+func formatRequestHandler(w http.ResponseWriter, r *http.Request) {
+    ret := formatRequest(r)
+
+    fmt.Fprintf(w, "%s", ret)
+    return
+}
+
+// -----------------------------------
 // func: formatRequest
 //
 // generates ascii representation of a request
 //
 // From: https://medium.com/doing-things-right/pretty-printing-http-requests-in-golang-a918d5aaa000
 //
-func formatRequest(w http.ResponseWriter, r *http.Request) {
+func formatRequest(r *http.Request) string {
     // Create return string
     var request []string
 
@@ -108,10 +125,7 @@ func formatRequest(w http.ResponseWriter, r *http.Request) {
     }
 
     // Return the request as a string
-    //return strings.Join(request, "\n")
-
-    fmt.Fprintf(w, strings.Join(request, "\n"))
-    return
+    return strings.Join(request, "\n")
 }
 
 // -----------------------------------
@@ -194,8 +208,12 @@ func index(w http.ResponseWriter, r *http.Request) {
         userAgent := r.Header.Get("User-Agent")
 
         networkInfo := ""
+        requestPP   := ""
         if verbose {
             networkInfo = getNetworkInfo()
+        }
+        if headers {
+            requestPP   = formatRequest(r)
         }
 
         if CaseInsensitiveContains(userAgent, "wget") ||
@@ -205,6 +223,7 @@ func index(w http.ResponseWriter, r *http.Request) {
             CaseInsensitiveContains(userAgent, "lynx") {
             w.Header().Set("Content-Type", "text/txt")
 
+            fmt.Fprintf(w, "\n%s", requestPP)
             var content []byte
 
 	    if r.URL.Path == "/map" || r.URL.Path == "/MAP" {
@@ -225,7 +244,7 @@ func index(w http.ResponseWriter, r *http.Request) {
         //
         templateFile := "templates/index.html.tmpl"
 
-        if verbose {
+        if verbose || headers {
             templateFile = "templates/index.html.tmpl.verbose"
         }
 
@@ -242,6 +261,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Hostname: hostname,
 		Image:    image_name_version,
 		NetworkInfo:  networkInfo,
+		RequestPP:  requestPP,
         }
 
         // apply Context values to template
@@ -295,8 +315,8 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/test", statusCodeTest)
 
-	mux.HandleFunc("/echo", formatRequest)
-	mux.HandleFunc("/ECHO", formatRequest)
+	mux.HandleFunc("/echo", formatRequestHandler)
+	mux.HandleFunc("/ECHO", formatRequestHandler)
 
 	mux.HandleFunc("/ping", ping)
 	mux.HandleFunc("/PING", ping)
