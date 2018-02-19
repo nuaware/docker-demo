@@ -22,12 +22,12 @@ import (
 const (
 	// Courtesy of "telnet mapascii.me"
 	image_name_version = "IMAGE_NAME_VERSION"
-	image_version    = IMAGE_VERSION
-	MAP_ASCII_ART    = "static/img/mapascii.txt"
-        LOGO_ASCII_ART   = "static/img/REPLACE_LOGO"
-	escape = "\x1b"
-	colour_me_yellow = escape + "[1;33m"
-	colour_me_normal = escape + "[0;0m"
+	image_version      = IMAGE_VERSION
+	MAP_ASCII_ART      = "static/img/mapascii.txt"
+        LOGO_ASCII_ART     = "static/img/REPLACE_LOGO"
+	escape             = "\x1b"
+	colour_me_yellow   = escape + "[1;33m"
+	colour_me_normal   = escape + "[0;0m"
 )
 
 var (
@@ -41,17 +41,18 @@ type (
 		Title    string
 		Hostname string
 		Image    string
+		NetworkInfo string
 	}
 )
 
 // -----------------------------------
 // func: init
 //
-// Initialize listener:
+// Read command-line arguments:
 //
 func init() {
 	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
-	flag.BoolVar(&verbose, "v", false, "verbose (false)")
+	flag.BoolVar(&verbose,      "v",      false,   "verbose (false)")
 }
 
 // -----------------------------------
@@ -192,53 +193,45 @@ func index(w http.ResponseWriter, r *http.Request) {
         //
         userAgent := r.Header.Get("User-Agent")
 
+        networkInfo := ""
+        if verbose {
+            networkInfo = getNetworkInfo()
+        }
+
         if CaseInsensitiveContains(userAgent, "wget") ||
-           CaseInsensitiveContains(userAgent, "curl") ||
-           CaseInsensitiveContains(userAgent, "httpie") ||
-           CaseInsensitiveContains(userAgent, "links") ||
-           CaseInsensitiveContains(userAgent, "lynx") {
-           w.Header().Set("Content-Type", "text/txt")
+            CaseInsensitiveContains(userAgent, "curl") ||
+            CaseInsensitiveContains(userAgent, "httpie") ||
+            CaseInsensitiveContains(userAgent, "links") ||
+            CaseInsensitiveContains(userAgent, "lynx") {
+            w.Header().Set("Content-Type", "text/txt")
 
-           var content []byte
+            var content []byte
 
-	   if r.URL.Path == "/map" || r.URL.Path == "/MAP" {
-	       content, _ = ioutil.ReadFile( MAP_ASCII_ART )
-           } else {
-	       content, _ = ioutil.ReadFile( LOGO_ASCII_ART )
-           }
+	    if r.URL.Path == "/map" || r.URL.Path == "/MAP" {
+	        content, _ = ioutil.ReadFile( MAP_ASCII_ART )
+            } else {
+	        content, _ = ioutil.ReadFile( LOGO_ASCII_ART )
+            }
 
-	   w.Write([]byte(content))
-           fmt.Fprintf(w, "\nServed from container %s%s%s [image %s]\n", colour_me_yellow, hostname, colour_me_normal, image_name_version)
+	    w.Write([]byte(content))
+            fmt.Fprintf(w, "\nServed from container %s%s%s\nUsing image %s\n", colour_me_yellow, hostname, colour_me_normal, image_name_version)
 
-           if verbose {
-               ifaces, _ := net.Interfaces()
-               // handle err
-               for _, i := range ifaces {
-                   addrs, _ := i.Addrs()
-                   // handle err
-                   for _, addr := range addrs {
-                       var ip net.IP
-                       switch v := addr.(type) {
-                       case *net.IPNet:
-                               ip = v.IP
-                       case *net.IPAddr:
-                               ip = v.IP
-                       }
-                       // process IP address
-                       fmt.Fprintf(w, "ip %s\n", ip.String())
-                   }
-               }
-               fmt.Fprintf(w, "listening on %s\n", listenAddr)
-           }
+            fmt.Fprintf(w, "%s", networkInfo)
 
-	   return
+	    return
 	}
 
 	// else return html as normal ...
         //
-	t, err := loadTemplate("templates/index.html.tmpl")
+        templateFile := "templates/index.html.tmpl"
+
+        if verbose {
+            templateFile = "templates/index.html.tmpl.verbose"
+        }
+
+	t, err := loadTemplate(templateFile)
 	if err != nil {
-		log.Printf("error loading template: %s\n", err)
+		log.Printf("error loading template from %s: %s\n", templateFile, err)
 		return
 	}
 
@@ -248,10 +241,36 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Title:    title,
 		Hostname: hostname,
 		Image:    image_name_version,
-	}
+		NetworkInfo:  networkInfo,
+        }
 
         // apply Context values to template
 	t.Execute(w, cnt)
+}
+
+func getNetworkInfo() string {
+    ret := "Network interfaces:\n"
+
+    ifaces, _ := net.Interfaces()
+    // handle err
+    for _, i := range ifaces {
+        addrs, _ := i.Addrs()
+        // handle err
+        for _, addr := range addrs {
+            var ip net.IP
+            switch v := addr.(type) {
+                case *net.IPNet:
+                    ip = v.IP
+                case *net.IPAddr:
+                    ip = v.IP
+                }
+            // process IP address
+            ret = fmt.Sprintf("%sip %s\n", ret, ip.String())
+        }
+    }
+    ret = fmt.Sprintf("%slistening on port %s\n", ret, listenAddr)
+
+    return ret
 }
 
 // -----------------------------------

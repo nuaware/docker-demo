@@ -11,10 +11,11 @@
     </head>
     <body>
         <div class="content">
-            <img src="static/img/REPLACE_LOGO"/>
+            <img src="static/img/kubernetes_white.png"/>
             <h1 class="lsf title">{{ .Title }}</h1>
             <h2 class="lsf info">Served from <strong>{{ .Hostname }}</strong></h2>
             <h3 class="lsf info">Using image {{ .Image }}</h3>
+            <h3 class="lsf info">Served from network:{{ .NetworkInfo }}</h3>
         </div>
     </body>
 </html>
