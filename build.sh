@@ -1,7 +1,14 @@
 #!/bin/bash
 
-echo; echo "Docker login:"
-docker login
+VERSIONS=6
+
+################################################################################
+# Functions:
+
+die() {
+    echo "$0: die - $*" >&2
+    exit 1
+}
 
 push_images() {
     for image in $*; do
@@ -29,7 +36,21 @@ build_image() {
     set +x
 }
 
-VERSIONS=6
+################################################################################
+# Main:
+
+#DHUB_ARGS=""
+#[ ! -z "$DHUB_USER" ] && DHUB_ARGS="$DHUB_ARGS -u $DHUB_USER"
+echo; echo "Docker login:"
+#docker login $DHUB_ARGS
+if [ ! -z "$DHUB_PWD" ];then
+    [ -z "$DHUB_USER" ] && die "Must set DHUB_USER if DHUB_PWD is used"
+
+    echo "$DHUB_PWD" | docker login --username $DHUB_USER --password-stdin
+else
+    docker login
+fi
+
 
 build_image "docker_blue.txt"   "docker_blue.png"   mjbright/docker-demo:1
 build_image "docker_green.txt"  "docker_green.png"  mjbright/docker-demo:2
