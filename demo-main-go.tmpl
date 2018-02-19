@@ -53,7 +53,7 @@ type (
 // Read command-line arguments:
 //
 func init() {
-	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
+	flag.StringVar(&listenAddr, "listen", ":EXPOSE_PORT", "listen address")
 	flag.BoolVar(&verbose,      "v",      false,   "verbose (false)")
 	flag.BoolVar(&headers,      "h",      false,   "show headers (false)")
 }
