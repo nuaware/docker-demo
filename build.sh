@@ -25,12 +25,14 @@ build_image() {
     IMAGE_VERSION=${IMAGE_NAME_VERSION#*:}
 
     echo; echo "---- Building image $IMAGE_NAME_VERSION [VERSION:$IMAGE_VERSION]"
+
     sed -e "s/REPLACE_LOGO/$TXT_IMAGE/" \
         -e "s?IMAGE_NAME_VERSION?$IMAGE_NAME_VERSION?" \
         -e "s/IMAGE_VERSION/$IMAGE_VERSION/" \
         demo-main-go.tmpl > main.go
+
     sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
-    sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.verbose.tmpl > templates/index.html.tmpl.verbose
+
     set -x
     docker build -t $IMAGE_NAME_VERSION .
     set +x
