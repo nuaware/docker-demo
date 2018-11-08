@@ -2,8 +2,10 @@
 
 VERSIONS=6
 
-EXPOSE_PORT=4321
+#EXPOSE_PORT=4321
 EXPOSE_PORT=80
+
+CACHE="--no-cache"
 
 ################################################################################
 # Functions:
@@ -41,7 +43,7 @@ build_image() {
     sed "s/EXPOSE_PORT/$EXPOSE_PORT/" test.sh.tmpl > test.sh
 
     set -x
-    docker build -t $IMAGE_NAME_VERSION .
+    docker build $CACHE -t $IMAGE_NAME_VERSION .
     set +x
 }
 
