@@ -5,8 +5,7 @@ VERSIONS=6
 HEADERS=""
 VERBOSE=""
 
-INT_PORT=80
-BASE_PORT=8080
+EXT_PORT=80
 
 ################################################################################
 # Functions:
@@ -20,9 +19,7 @@ press() {
 OLD() {
   for image in mjbright/docker-demo:1 mjbright/docker-demo:2 mjbright/k8s-demo:1 mjbright/k8s-demo:2; do
     echo "Testing image $image"
-
-    EXT_PORT=8080
-    docker run -d -p ${EXT_PORT}:${INT_PORT} $image
+    docker run -d -p ${EXT_PORT}:${EXT_PORT} $image
     ID=$(docker ps -ql)
 
     [ -z "$ID" ] && { echo "ERROR: Failed to launch container"; continue; }
@@ -76,22 +73,23 @@ done
 CLEANUP
 
 for image in mjbright/docker-demo mjbright/k8s-demo; do
+    BASE_PORT=9100
     [ $image = "mjbright/docker-demo" ] && BASE_PORT=9000
 
     for version in $(seq $VERSIONS); do
-        let EXT_PORT=BASE_PORT+version
+        let PORT=BASE_PORT+version
 
         #docker pull $image:$version
 
         # expose container port on localhost:
-        #docker run --rm -p ${EXT_PORT}:${INT_PORT} -d $image:$version
+        #docker run --rm -p ${PORT}:${EXT_PORT} -d $image:$version
 
         # expose listen on container port:
-        #docker run --rm -d $image:$version $HEADERS $VERBOSE -listen $INT_PORT
-        #docker run -d $image:$version $HEADERS $VERBOSE -listen :$INT_PORT
+        #docker run --rm -d $image:$version $HEADERS $VERBOSE -listen $PORT
+        #docker run -d $image:$version $HEADERS $VERBOSE -listen :$PORT
 
         # expose listen on container port and expose on localhost: quel interet?
-        docker run --rm -d -p ${EXT_PORT}:${INT_PORT} $image:$version $HEADERS $VERBOSE -listen :$INT_PORT
+        docker run --rm -d -p ${PORT}:${PORT} $image:$version $HEADERS $VERBOSE -listen :$PORT
     done
 done
 
