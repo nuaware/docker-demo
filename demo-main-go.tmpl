@@ -225,19 +225,37 @@ func index(w http.ResponseWriter, r *http.Request) {
 	        content, _ = ioutil.ReadFile( LOGO_ASCII_ART )
             }
 
-	    if r.URL.Path != "/1line" {
-	        w.Write([]byte(content))
-            }
-
             myIP := GetOutboundIP()
             from := r.RemoteAddr
             fwd := r.Header.Get("X-Forwarded-For")
 
-            fmt.Fprintf(w, "\nServed from container %s%s[%s]%s\n", colour_me_yellow, hostname, myIP, colour_me_normal)
-            //fmt.Fprintf(w, "Request from %s [forwarded for %s]\n", from, fwd)
-            fmt.Fprintf(w, "Request from %s [%s]\n", from, fwd)
-            fmt.Fprintf(w, "%s\n", networkInfo)
-            fmt.Fprintf(w, "Using image %s\n", image_name_version)
+	    if r.URL.Path != "/1line" {
+	        w.Write([]byte(content))
+            }
+
+            p1 := fmt.Sprintf("Served from container %s%s[%s]%s", colour_me_yellow, hostname, myIP, colour_me_normal)
+            p2 := fmt.Sprintf("Request from %s [%s]", from, fwd)
+            p3 := ""
+            if networkInfo != "" {
+                p3 = fmt.Sprintf("%s ", networkInfo)
+	        if r.URL.Path != "/1line" {
+                    p3 = p3 + "\n"
+                }
+            }
+            p4 := fmt.Sprintf("image <%s>\n", image_name_version)
+
+	    if r.URL.Path == "/1line" {
+                fmt.Fprintf(w, p1 + " " + p2 + " " + p3 + p4)
+            } else {
+                fmt.Fprintf(w, "\n")
+                fmt.Fprintf(w, p1)
+                fmt.Fprintf(w, "\n")
+                fmt.Fprintf(w, p2)
+                fmt.Fprintf(w, "\n")
+                fmt.Fprintf(w, p3)
+                fmt.Fprintf(w, p4)
+                fmt.Fprintf(w, "\n")
+            }
 
 	    return
 	}
