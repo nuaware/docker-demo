@@ -77,8 +77,12 @@ build_image "kubernetes_yellow.txt" "kubernetes_yellow.png" mjbright/k8s-demo:4
 build_image "kubernetes_cyan.txt"   "kubernetes_cyan.png"   mjbright/k8s-demo:5
 build_image "kubernetes_white.txt"  "kubernetes_white.png"  mjbright/k8s-demo:6
 
+for version in $(seq $VERSIONS); do
+    docker tag mjbright/k8s-demo:$version  mjbright/ckad-demo:$version
+done
+
 IMAGES=""
-for image in mjbright/docker-demo mjbright/k8s-demo; do
+for image in mjbright/docker-demo mjbright/k8s-demo mjbright/ckad-demo; do
    for version in $(seq $VERSIONS); do
        IMAGES+="${image}:${version} "
    done
