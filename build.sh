@@ -107,10 +107,24 @@ build_image "kubernetes_yellow.txt" "kubernetes_yellow.png" mjbright/k8s-demo:ba
 build_image "kubernetes_cyan.txt"   "kubernetes_cyan.png"   mjbright/k8s-demo:bad5 "50s" "20s"
 build_image "kubernetes_white.txt"  "kubernetes_white.png"  mjbright/k8s-demo:bad6 "50s" "20s"
 
-for version in $(seq $VERSIONS); do
-    docker tag mjbright/k8s-demo:$version  mjbright/ckad-demo:$version
-    docker tag mjbright/k8s-demo:bad$version  mjbright/ckad-demo:bad$version
-done
+build_image "kubernetes_blue.txt"   "kubernetes_blue.png"   mjbright/ckad-demo:1 "OK" "OK"
+build_image "kubernetes_green.txt"  "kubernetes_green.png"  mjbright/ckad-demo:2 "OK" "OK"
+build_image "kubernetes_red.txt"    "kubernetes_red.png"    mjbright/ckad-demo:3 "OK" "OK"
+build_image "kubernetes_yellow.txt" "kubernetes_yellow.png" mjbright/ckad-demo:4 "OK" "OK"
+build_image "kubernetes_cyan.txt"   "kubernetes_cyan.png"   mjbright/ckad-demo:5 "OK" "OK"
+build_image "kubernetes_white.txt"  "kubernetes_white.png"  mjbright/ckad-demo:6 "OK" "OK"
+
+build_image "kubernetes_blue.txt"   "kubernetes_blue.png"   mjbright/ckad-demo:bad1 "50s" "20s"
+build_image "kubernetes_green.txt"  "kubernetes_green.png"  mjbright/ckad-demo:bad2 "50s" "20s"
+build_image "kubernetes_red.txt"    "kubernetes_red.png"    mjbright/ckad-demo:bad3 "50s" "20s"
+build_image "kubernetes_yellow.txt" "kubernetes_yellow.png" mjbright/ckad-demo:bad4 "50s" "20s"
+build_image "kubernetes_cyan.txt"   "kubernetes_cyan.png"   mjbright/ckad-demo:bad5 "50s" "20s"
+build_image "kubernetes_white.txt"  "kubernetes_white.png"  mjbright/ckad-demo:bad6 "50s" "20s"
+
+#for version in $(seq $VERSIONS); do
+#    docker tag mjbright/k8s-demo:$version  mjbright/ckad-demo:$version
+#    docker tag mjbright/k8s-demo:bad$version  mjbright/ckad-demo:bad$version
+#done
 
 IMAGES=""
 for image in mjbright/docker-demo mjbright/k8s-demo mjbright/ckad-demo; do
