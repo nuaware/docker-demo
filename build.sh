@@ -43,9 +43,15 @@ build_image() {
         demo-main-go.tmpl > main.go
 
     IMAGE_NAME=${IMAGE_NAME_VERSION%:*}
-    USE_IMAGE_NAME=$(echo $IMAGE_SNAME | sed -e 's?/?_?g')
+    USE_IMAGE_NAME=$(echo $IMAGE_NAME | sed -e 's?/?_?g')
+    #echo "IMAGE_NAME_VERSION=${IMAGE_NAME_VERSION}"
+    #echo "IMAGE_NAME=${IMAGE_NAME}"
+    #echo "USE_IMAGE_NAME=${USE_IMAGE_NAME}"
     mkdir -p tmp
-    cp -a main.go tmp/main_${USE_IMAGE_NAME}_${IMAGE_VERSION}.go
+    DEST=tmp/main_${USE_IMAGE_NAME}_${IMAGE_VERSION}.go
+    echo cp -a main.go $DEST
+    cp -a main.go $DEST
+    #exit 0
 
     sed "s/REPLACE_LOGO/$PNG_IMAGE/" templates/index.html.tmpl.tmpl > templates/index.html.tmpl
 
