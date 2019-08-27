@@ -21,10 +21,10 @@ import (
 
 const (
 	// Courtesy of "telnet mapascii.me"
-	image_name_version = "IMAGE_NAME_VERSION"
-	image_version      = IMAGE_VERSION
+	image_name_version = "TEMPLATE_IMAGE_NAME_VERSION"
+	image_version      = "TEMPLATE_IMAGE_VERSION"
 	MAP_ASCII_ART      = "static/img/mapascii.txt"
-        LOGO_ASCII_ART     = "static/img/REPLACE_LOGO"
+        LOGO_ASCII_ART     = "static/img/TEMPLATE_REPLACE_LOGO"
 	escape             = "\x1b"
 	colour_me_yellow   = escape + "[1;33m"
 	colour_me_normal   = escape + "[0;0m"
@@ -66,7 +66,7 @@ func GetOutboundIP() net.IP {
 // Read command-line arguments:
 //
 func init() {
-	flag.StringVar(&listenAddr, "listen", ":EXPOSE_PORT", "listen address")
+	flag.StringVar(&listenAddr, "listen", ":TEMPLATE_EXPOSE_PORT", "listen address")
 	flag.BoolVar(&verbose,      "v",      false,   "verbose (false)")
 	flag.BoolVar(&headers,      "h",      false,   "show headers (false)")
 }
@@ -174,9 +174,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 		hostname = "unknown"
 	}
 
-        // image_version 3: return early with status code 404 or /CODE (from r.URL.Path)
+        // image_version "3": return early with status code 404 or /CODE (from r.URL.Path)
         //
-        if image_version == 3 {
+        if "image_version" == "3" {
             //fmt.Fprintf(w, "\nPATH=<%s>", r.URL.Path)
             //if r.URL.Path == "/map" || r.URL.Path == "/MAP" {}
 
@@ -194,26 +194,6 @@ func index(w http.ResponseWriter, r *http.Request) {
             }
 
             return
-        }
-
-        // image_version 4: return content after delay of 60 secs or /SECS (from r.URL.Path)
-        //
-        if image_version == 4 {
-            fmt.Fprintf(w, "\nPATH=<%s>", r.URL.Path)
-
-	    DEFAULT_SECS := 60
-
-            delay := time.Duration(DEFAULT_SECS) * 1000 * time.Millisecond
-
-            num, err := strconv.Atoi( r.URL.Path[1:] )
-            if err == nil {
-                fmt.Fprintf(w, "\nSleeping <%d> secs\n", num)
-                delay = time.Duration(num) * 1000 * time.Millisecond
-            } else {
-                fmt.Fprintf(w, "\nSleeping default <%d> secs\n", DEFAULT_SECS)
-            }
-
-	    time.Sleep(delay)
         }
 
         // Get user-agent: if text-browser, e.g. wget/curl/httpie/lynx/elinks return ascii-text image:
@@ -329,6 +309,18 @@ func ping(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 
+	DEFAULT_SECS := 60
+
+        if "TEMPLATE_LIVENESS" != "OK"  {
+            secs, err := strconv.Atoi( "TEMPLATE_LIVENESS" )
+            if err != nil {
+                secs = DEFAULT_SECS
+            }
+            delay := time.Duration(secs) * 1000 * time.Millisecond
+            log.Printf("\n[liveness] Sleeping <%d> secs\n", secs)
+	    time.Sleep(delay)
+        }
+
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/test", statusCodeTest)
@@ -342,8 +334,17 @@ func main() {
 	mux.HandleFunc("/MAP", index)
 	mux.HandleFunc("/map", index)
 
-	log.Printf("listening on %s\n", listenAddr)
+        if "TEMPLATE_READINESS" != "OK"  {
+            secs, err := strconv.Atoi( "TEMPLATE_READINESS" )
+            if err != nil {
+                secs = DEFAULT_SECS
+            }
+            delay := time.Duration(secs) * 1000 * time.Millisecond
+            log.Printf("\n[readiness] Sleeping <%d> secs\n", secs)
+	    time.Sleep(delay)
+        }
 
+	log.Printf("listening on %s\n", listenAddr)
 	if err := http.ListenAndServe(listenAddr, mux); err != nil {
 		log.Fatalf("error serving: %s", err)
 	}
