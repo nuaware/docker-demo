@@ -18,7 +18,8 @@ press() {
 }
 
 OLD() {
-  for image in mjbright/docker-demo:1 mjbright/docker-demo:2 mjbright/k8s-demo:1 mjbright/k8s-demo:2; do
+  #for image in nuaware/docker-demo:1 nuaware/docker-demo:2 nuaware/k8s-demo:1 nuaware/k8s-demo:2; do
+  for image in nuaware/docker-demo:1 nuaware/docker-demo:2 nuaware/k8s-demo:1 nuaware/k8s-demo:2; do
     echo "Testing image $image"
     docker run -d -p ${EXT_PORT}:${EXT_PORT} $image
     ID=$(docker ps -ql)
@@ -73,9 +74,10 @@ done
 
 CLEANUP
 
-for image in mjbright/docker-demo mjbright/k8s-demo; do
+#for image in nuaware/docker-demo nuaware/k8s-demo; do
+for image in nuaware/k8s-demo; do
     BASE_PORT=9100
-    [ $image = "mjbright/docker-demo" ] && BASE_PORT=9000
+    [ $image = "nuaware/docker-demo" ] && BASE_PORT=9000
 
     for version in $(seq $VERSIONS); do
         let PORT=BASE_PORT+version

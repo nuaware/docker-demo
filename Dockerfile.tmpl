@@ -8,11 +8,11 @@ ADD . /src
 # Command works:
 
 # VERSION to use with 'FROM alpine' below:
-#RUN cd /src && go build -o docker-demo
+#RUN cd /src && go build -o demo-binary
 
 # VERSION to use with 'FROM scratch' below:
-#RUN cd /src && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w' -o docker-demo *.go
-RUN cd /src && CGO_ENABLED=0 go build -a -o docker-demo
+#RUN cd /src && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w' -o demo-binary *.go
+RUN cd /src && CGO_ENABLED=0 go build -a -o demo-binary
 
 # -- final stage ---------------------------------------------
 
@@ -24,9 +24,9 @@ ADD static    /app/static
 ADD templates /app/templates
 
 WORKDIR /app
-COPY    --from=build-env /src/docker-demo /app/
+COPY    --from=build-env /src/demo-binary /app/
 
 EXPOSE EXPOSE_PORT
-ENTRYPOINT ["/app/docker-demo"]
+ENTRYPOINT ["/app/demo-binary"]
 CMD ["-listen=:EXPOSE_PORT"]
 
