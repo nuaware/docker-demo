@@ -132,7 +132,10 @@ build_image "kubernetes_white.txt"  "kubernetes_white.png"  nuaware/ckad-demo:ba
 IMAGES=""
 #for image in nuaware/docker-demo nuaware/k8s-demo nuaware/ckad-demo; do
 for image in nuaware/k8s-demo; do
+   docker tag ${image}:1 ${image}
+
    for version in $(seq $VERSIONS); do
+       IMAGES+="${image}"
        IMAGES+="${image}:${version} "
        IMAGES+="${image}:bad${version} "
    done
