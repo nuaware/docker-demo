@@ -135,9 +135,9 @@ for image in nuaware/k8s-demo; do
    docker tag ${image}:1 ${image}
 
    for version in $(seq $VERSIONS); do
-       IMAGES+="${image}"
-       IMAGES+="${image}:${version} "
-       IMAGES+="${image}:bad${version} "
+       IMAGES+=" ${image}"
+       IMAGES+=" ${image}:${version} "
+       IMAGES+=" ${image}:bad${version} "
    done
 done
 
